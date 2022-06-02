@@ -1,0 +1,46 @@
+# Prettier code formatter config
+allowExplicitAny: true
+# Maximum of 100 characters per line
+printWidth: 100
+
+# Ident new lines by 2 characters
+tabWidth: 4
+
+# Use spaces for identation
+useTabs: false
+
+# Always place semicolons at statements
+semi: true
+
+# Single quotes
+singleQuote: true
+
+# But quote props if needed
+quoteProps: "as-needed"
+
+# And quote jsx props with double quotes
+jsxSingleQuote: false
+
+# Always append trailing commas as they make git diffs more readable
+trailingComma: "all"
+
+# Put spaces inside brackets { foo }
+bracketSpacing: true
+
+# Append closing bracet of jsx elements into the next line
+jsxBracketSameLine: false
+
+# Always surround arrow function parameters with parens
+arrowParens: "always"
+
+# File type specific overrides
+overrides:
+  - files: "*.json"
+    options:
+      semi: false
+      singleQuote: false
+      tabWidth: 3
+  - files: "*.yaml"
+    options:
+      semi: false
+      singleQuote: false
