@@ -1,7 +1,8 @@
 import * as detrend_func from './modules/Detrend';
 import { window_function } from './modules/Windowing';
+import { fft } from './modules/FFT';
 
-export function welch(
+export default function welch(
     x: number[],
     fs = 1.0,
     window:
@@ -19,6 +20,8 @@ export function welch(
     if (typeof nperseg === 'undefined') nperseg = x.length;
 
     if (typeof noverlap === 'undefined') noverlap = Math.floor(nperseg / 2);
+
+    if(typeof nfft === 'undefined') nfft = nperseg
 
     /**
      * Detrend Data
@@ -48,12 +51,12 @@ export function welch(
     }
 
     /**
-     * Create FFFTT ODEER PSD ODER SO
+     * Create Frequency Spectrum
      */
     let fft_windows: number[][] = new Array();
-
-    //TODO
-
+    for(let i = 0; i < windows.length; i++)
+        //TODO: Rescale for either density or spectrum
+        fft_windows.push(fft(windows[i], fs, nfft))
 
     /**
      * Average all PSDs
@@ -79,7 +82,7 @@ function create_windows(x: number[], nperseg: number, noverlap: number) {
     }
 
     /**
-     * Add the last not full window, fill with zeros until full window is made
+     * Add the last not full window, fill with zeros until length of one full window is reached
      */
     if (j < x.length - 1) {
         let last_window: number[] = new Array();

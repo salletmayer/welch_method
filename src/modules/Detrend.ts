@@ -5,7 +5,7 @@ const mean = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
  */
 export function linear(y: number[], fs: number) {
     /**
-     * Create y values for x from fs
+     * Create x values for y from fs
      */
     let x: number[] = new Array();
 
@@ -50,7 +50,7 @@ export function linear(y: number[], fs: number) {
 }
 
 /**
- * Calcualtes the mean of function and subtracts it
+ * Calculates the mean of function and subtracts it
  */
 export function constant(x: number[]) {
     const _mean = mean(x);
