@@ -14,26 +14,14 @@ export default function welch(
     nperseg: number | undefined = undefined,
     noverlap: number | undefined = undefined,
     nfft: number | undefined = undefined,
-    detrend: 'linear' | 'constant' | 'none' = 'none',
+    detrend: 'linear' | 'constant' | 'none' | ((x: number[]) => number[]) = 'none',
     scaling: 'density' | 'spectrum',
 ) {
     if (typeof nperseg === 'undefined') nperseg = x.length;
 
     if (typeof noverlap === 'undefined') noverlap = Math.floor(nperseg / 2);
 
-    if(typeof nfft === 'undefined') nfft = nperseg
-
-    /**
-     * Detrend Data
-     */
-    switch (detrend) {
-        case 'linear':
-            x = detrend_func.linear(x, fs);
-            break;
-        case 'constant':
-            x = detrend_func.constant(x);
-            break;
-    }
+    if (typeof nfft === 'undefined') nfft = nperseg;
 
     /**
      * Create Windows
@@ -41,9 +29,13 @@ export default function welch(
     let windows = create_windows(x, nperseg, noverlap);
 
     /**
+     * Detrend Windows
+     */
+    if (detrend !== 'none') windows = detrend_windows(windows, fs, detrend);
+
+    /**
      * Multiply Windows with window function
      */
-
     for (let i = 0; i < windows.length; i++) {
         if (typeof window === 'function')
             windows[i] = window_function('custom', windows[i], window);
@@ -54,9 +46,9 @@ export default function welch(
      * Create Frequency Spectrum
      */
     let fft_windows: number[][] = new Array();
-    for(let i = 0; i < windows.length; i++)
+    for (let i = 0; i < windows.length; i++)
         //TODO: Rescale for either density or spectrum
-        fft_windows.push(fft(windows[i], fs, nfft))
+        fft_windows.push(fft(windows[i], fs, nfft));
 
     /**
      * Average all PSDs
@@ -92,6 +84,20 @@ function create_windows(x: number[], nperseg: number, noverlap: number) {
         }
 
         windows.push(last_window);
+    }
+
+    return windows;
+}
+
+function detrend_windows(
+    windows: number[][],
+    fs: number,
+    detrend: 'linear' | 'constant' | 'none' | ((x: number[]) => number[]),
+) {
+    for (let i = 0; i < windows.length; i++) {
+        if (typeof detrend === 'function') windows[i] = detrend(windows[i]);
+        else if (detrend === 'linear') windows[i] = detrend_func.linear(windows[i], fs);
+        else if (detrend === 'constant') windows[i] = detrend_func.constant(windows[i]);
     }
 
     return windows;
