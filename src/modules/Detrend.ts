@@ -44,9 +44,9 @@ export function linear(y: number[], fs: number) {
      * This creates a linear detrended dataset.
      */
     let detrend_y: number[] = new Array();
-    y.forEach((y_value: number, index: number) => detrend_y.push(y_value - (k * (x[index]) + d)))
+    y.forEach((y_value: number, index: number) => detrend_y.push(y_value - (k * x[index] + d)));
 
-    return detrend_y
+    return detrend_y;
 }
 
 /**

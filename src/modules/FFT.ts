@@ -1,7 +1,7 @@
 import { Complex } from "./Complex";
 
 /**
- * Uses fft.js to transform time series to frequency domain
+ * Uses a recursive fft function to transform time series to frequency domain. Very simple Cooley Tukey implementation.
  */
 export function fft(x: number[], fs: number, nfft: number) {
     //Fill with zeros if nfft greater than x length
