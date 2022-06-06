@@ -16,6 +16,7 @@ export default function welch(
     nfft: number | undefined = undefined,
     detrend: 'linear' | 'constant' | 'none' | ((x: number[]) => number[]) = 'none',
     scaling: 'density' | 'spectrum',
+    average: 'mean' | 'median' = 'mean',
 ) {
     if (typeof nperseg === 'undefined') nperseg = x.length;
 
@@ -53,9 +54,14 @@ export default function welch(
     /**
      * Average all PSDs
      */
-    const averaged_psd = average_columns(fft_windows);
+    let pow: number[] = new Array();
+    if (average == 'mean') pow = mean_columns(fft_windows);
+    else if (average == 'median') pow = median_columns(fft_windows);
+    else throw new Error('bad parameter: ' + average);
 
-    return averaged_psd;
+    const fqus = find_frequencies(fs, pow.length);
+
+    return { powers: pow, frequencies: fqus };
 }
 
 function create_windows(x: number[], nperseg: number, noverlap: number) {
@@ -103,10 +109,39 @@ function detrend_windows(
     return windows;
 }
 
+function find_frequencies(fs: number, N: number) {
+    let frequencies: number[] = new Array(N);
+
+    for (let i = 0; i < frequencies.length; i++) frequencies[i] = (i * fs) / N;
+
+    return frequencies;
+}
+
 /**
  * A function to get the average of every column in a 2D Array
  * https://stackoverflow.com/questions/49062795/average-a-columns-in-a-2d-array-with-functional-programming
  */
-const average_columns = (a: number[][]) => {
+const mean_columns = (a: number[][]) => {
     return a[0].map((col, i) => a.map((row) => row[i]).reduce((acc, c) => acc + c, 0) / a.length);
 };
+
+function median_columns(a: number[][]) {
+    let median_array: number[] = new Array(a.length);
+
+    for (let i = 0; i < median_array.length; i++) {
+        median_array[i] = find_median(a[i]);
+    }
+
+    return median_array;
+}
+
+/**
+ * Finds median of an array
+ * https://www.w3resource.com/javascript-exercises/fundamental/javascript-fundamental-exercise-88.php
+ */
+function find_median(arr: number[]) {
+    const mid = Math.floor(arr.length / 2);
+    const sorted_arr = arr.sort((a: number, b: number) => a - b);
+
+    return arr.length % 2 !== 0 ? sorted_arr[mid] : (sorted_arr[mid - 1] + sorted_arr[mid]) / 2;
+}
