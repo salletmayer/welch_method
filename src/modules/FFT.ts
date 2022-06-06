@@ -5,7 +5,7 @@ import { Complex } from './Complex';
  */
 export function fft(x: number[], fs: number, nfft: number) {
     //Fill with zeros if nfft greater than x length
-    if (nfft > x.length) for (let i = x.length; i < nfft; i++) x.push(0);
+    for (let i = x.length; i < nfft; i++) x.push(0);
 
     let x_complex: Complex[] = new Array(x.length);
     for (let i = 0; i < x_complex.length; i++) x_complex[i] = new Complex(x[i], 0);
